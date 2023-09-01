@@ -123,6 +123,9 @@ class Quarantine
     extra_attributes = @options[:extra_attributes] ? @options[:extra_attributes].call(example) : {}
 
     new_consecutive_passes = passed ? (@old_tests[example.id]&.consecutive_passes || 0) + 1 : 0
+
+    puts "consecutive_passes: #{@old_tests[example.id]&.consecutive_passes}"
+
     release_at = @options[:release_at_consecutive_passes]
     new_status = !release_at.nil? && new_consecutive_passes >= release_at ? :passing : status
     test = Quarantine::Test.new(
