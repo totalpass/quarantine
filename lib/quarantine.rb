@@ -97,7 +97,7 @@ class Quarantine
       log('Number of quarantined tests above failsafe limit; skipping recording')
     else
       begin
-        timestamp = Time.now.to_i / 1000 # Truncated millisecond from timestamp for reasons specific to Flexport
+        timestamp = Time.current.utc.iso8601
         database.write_items(
           @options[:test_statuses_table_name],
           @tests.values.map { |item| item.to_hash.merge('updated_at' => timestamp) }
@@ -123,8 +123,6 @@ class Quarantine
     extra_attributes = @options[:extra_attributes] ? @options[:extra_attributes].call(example) : {}
 
     new_consecutive_passes = passed ? (@old_tests[example.id]&.consecutive_passes || 0) + 1 : 0
-
-    puts "consecutive_passes: #{@old_tests[example.id]&.consecutive_passes}"
 
     release_at = @options[:release_at_consecutive_passes]
     new_status = !release_at.nil? && new_consecutive_passes >= release_at ? :passing : status
